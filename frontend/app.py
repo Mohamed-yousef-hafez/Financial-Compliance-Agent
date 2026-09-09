@@ -1,3 +1,4 @@
+import os
 import requests
 import streamlit as st
 
@@ -11,8 +12,9 @@ st.set_page_config(
 
 API_URL = st.sidebar.text_input(
     "API URL",
-    "http://127.0.0.1:8000",
+    os.getenv("API_URL", "http://127.0.0.1:8000"),
 )
+
 
 tenant_id = st.sidebar.text_input(
     "Tenant ID",
