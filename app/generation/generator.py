@@ -1,4 +1,5 @@
 import os
+import time
 
 from google import genai
 
@@ -65,9 +66,35 @@ Evidence:
 Provide a concise answer and mention the relevant source.
 """
 
-        response = self.client.models.generate_content(
-            model="gemini-3.6-flash",
-            contents=prompt,
-        )
+        max_attempts = 3
 
-        return response.text.strip()
+        for attempt in range(max_attempts):
+            try:
+                response = self.client.models.generate_content(
+                    model="gemini-3.6-flash",
+                    contents=prompt,
+                )
+
+                return response.text.strip()
+
+            except Exception as exc:
+                error_text = str(exc)
+
+                is_unavailable = (
+                    "503" in error_text
+                    or "UNAVAILABLE" in error_text
+                    or "high demand" in error_text.lower()
+                )
+
+                if not is_unavailable:
+                    raise
+
+                if attempt == max_attempts - 1:
+                    return (
+                        "I cannot answer reliably right now "
+                        "because the AI generation service "
+                        "is temporarily unavailable. "
+                        "Please try again shortly."
+                    )
+
+                time.sleep(2 ** attempt)
