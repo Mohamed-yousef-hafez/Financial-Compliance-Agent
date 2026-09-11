@@ -11,4 +11,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["sh", "-c", "streamlit run frontend/app.py --server.address=0.0.0.0 --server.port=${PORT:-8501}"]
+RUN chmod +x start_frontend.sh
+
+CMD ["./start_frontend.sh"]
