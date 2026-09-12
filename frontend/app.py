@@ -171,30 +171,73 @@ if st.button("Analyze", type="primary"):
                         risk["matched_terms"],
                     )
 
-                st.subheader("Sources")
+                st.subheader("Evidence Used")
 
-                if result["sources"]:
-                    for source in result["sources"]:
-                        st.write(
-                            f"- {source['source']} "
-                            f"| Page {source['page']} "
-                            f"| Score {source['score']}"
-                        )
-                else:
-                    st.write(
-                        "No supporting sources found."
+                sources = result.get("sources", [])
+
+                if sources:
+                    st.caption(
+                        "Evidence retrieved from the uploaded documents. "
+                        "The relevance score is not a probability."
                     )
 
-                st.subheader(
-                    "Decision Trace"
+                    for index, source in enumerate(
+                        sources,
+                        start=1,
+                    ):
+                        source_name = source.get(
+                            "source",
+                            "Unknown source",
+                        )
+
+                        page = source.get(
+                            "page",
+                            "N/A",
+                        )
+
+                        score = source.get("score")
+
+                        if score is not None:
+                            score_text = f"{float(score):.4f}"
+                        else:
+                            score_text = "N/A"
+
+                        with st.expander(
+                            f"{index}. {source_name} "
+                            f"— Page {page} "
+                            f"— Relevance: {score_text}"
+                        ):
+                            evidence_text = source.get(
+                                "text",
+                                "Evidence text is not available.",
+                            )
+
+                            st.markdown("**Evidence text:**")
+                            st.write(evidence_text)
+
+                else:
+                    st.info(
+                        "No supporting evidence was found."
+                    )
+
+                    
+
+                st.subheader("Decision Trace")
+
+                decision_trace = result.get(
+                    "decision_trace",
+                    [],
                 )
 
-                for step in result[
-                    "decision_trace"
-                ]:
-                    st.write(
-                        f"✓ {step}"
+                if decision_trace:
+                    for step in decision_trace:
+                        st.write(f"✓ {step}")
+                else:
+                    st.info(
+                        "No decision trace available."
                     )
+                                    
+                                
 
         except requests.RequestException as exc:
             st.error(

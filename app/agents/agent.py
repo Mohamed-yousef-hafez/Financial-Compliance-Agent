@@ -99,6 +99,7 @@ class ComplianceAgent:
                     item.get("rerank_score", 0.0),
                     4,
                 ),
+                "text": item["text"],
             }
             for item in ranked
         ]
