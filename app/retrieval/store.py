@@ -1,4 +1,5 @@
 import chromadb
+
 from chromadb.utils.embedding_functions import (
     SentenceTransformerEmbeddingFunction,
 )
@@ -8,7 +9,10 @@ from app.core.config import CHROMA_DIR, EMBEDDING_MODEL
 
 class ChromaStore:
     def __init__(self):
-        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+        CHROMA_DIR.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
 
         self.client = chromadb.PersistentClient(
             path=str(CHROMA_DIR)
@@ -20,11 +24,54 @@ class ChromaStore:
             )
         )
 
-        self.collection = self.client.get_or_create_collection(
-            name="financial_compliance",
-            embedding_function=self.embedding_function,
-            metadata={"hnsw:space": "cosine"},
+        self.collection = (
+            self.client.get_or_create_collection(
+                name="financial_compliance",
+                embedding_function=self.embedding_function,
+                metadata={"hnsw:space": "cosine"},
+            )
         )
+
+    def _build_id(self, metadata):
+        return (
+            f"{metadata['tenant_id']}:"
+            f"{metadata['document_id']}:"
+            f"{metadata['page']}:"
+            f"{metadata['chunk_id']}"
+        )
+
+    def delete_documents(
+        self,
+        tenant_id,
+        document_ids=None,
+        sources=None,
+    ):
+        where_conditions = []
+
+        if tenant_id:
+            where_conditions.append(
+                {"tenant_id": tenant_id}
+            )
+
+        if document_ids:
+            where_conditions.append(
+                {"document_id": {"$in": document_ids}}
+            )
+
+        if sources:
+            where_conditions.append(
+                {"source": {"$in": sources}}
+            )
+
+        if not where_conditions:
+            return
+
+        if len(where_conditions) == 1:
+            where = where_conditions[0]
+        else:
+            where = {"$and": where_conditions}
+
+        self.collection.delete(where=where)
 
     def upsert(self, documents):
         if not documents:
@@ -37,12 +84,8 @@ class ChromaStore:
         for item in documents:
             metadata = item["metadata"]
 
-            document_id = metadata["document_id"]
-            page = metadata["page"]
-            chunk_id = metadata["chunk_id"]
-
             ids.append(
-                f"{metadata['tenant_id']}:{document_id}:{page}:{chunk_id}"
+                self._build_id(metadata)
             )
 
             texts.append(item["text"])
@@ -56,12 +99,31 @@ class ChromaStore:
 
         return len(ids)
 
+    def replace_documents(
+        self,
+        documents,
+        tenant_id,
+        document_ids=None,
+        sources=None,
+    ):
+        self.delete_documents(
+            tenant_id=tenant_id,
+            document_ids=document_ids,
+            sources=sources,
+        )
+
+        return self.upsert(documents)
+
     def query(self, question, tenant_id, top_k=8):
         result = self.collection.query(
             query_texts=[question],
             n_results=top_k,
             where={"tenant_id": tenant_id},
-            include=["documents", "metadatas", "distances"],
+            include=[
+                "documents",
+                "metadatas",
+                "distances",
+            ],
         )
 
         documents = result.get("documents") or [[]]
@@ -81,7 +143,10 @@ class ChromaStore:
         ):
             vector_score = max(
                 0.0,
-                min(1.0, 1.0 - float(distance)),
+                min(
+                    1.0,
+                    1.0 - float(distance),
+                ),
             )
 
             rows.append(
