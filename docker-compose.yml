@@ -1,0 +1,12 @@
+services:
+  compliance-agent:
+    build: .
+    container_name: financial-compliance-agent
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./chroma_db:/app/chroma_db
+      - ./data:/app/data
+    restart: unless-stopped
