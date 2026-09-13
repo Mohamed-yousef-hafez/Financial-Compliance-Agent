@@ -23,6 +23,41 @@ tenant_id = st.sidebar.text_input(
     "tenant_demo",
 )
 
+st.sidebar.divider()
+
+st.sidebar.subheader("Document Management")
+
+if st.sidebar.button(
+    "Clear Tenant Documents",
+    type="secondary",
+):
+    try:
+        clear_response = requests.delete(
+            f"{API_URL}/documents",
+            params={
+                "tenant_id": tenant_id,
+            },
+            timeout=60,
+        )
+
+        if clear_response.ok:
+            clear_data = clear_response.json()
+
+            st.sidebar.success(
+                f"Deleted {clear_data.get('files_deleted', 0)} file(s)."
+            )
+
+            st.sidebar.json(clear_data)
+
+        else:
+            st.sidebar.error(
+                f"Clear failed: {clear_response.text}"
+            )
+
+    except requests.RequestException as exc:
+        st.sidebar.error(
+            f"API connection failed: {exc}"
+        )
 
 st.title("Financial Compliance Agent")
 
