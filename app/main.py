@@ -1,6 +1,5 @@
 import re
 from pathlib import Path
-
 from fastapi import FastAPI, File, HTTPException, UploadFile
 
 from app.agents.agent import ComplianceAgent
@@ -71,6 +70,37 @@ def health():
         "service": "financial-compliance-agent",
     }
 
+@app.delete("/documents")
+def clear_documents(tenant_id: str):
+    tenant_id = validate_tenant_id(tenant_id)
+
+    tenant_dir = DATA_DIR / tenant_id
+
+    deleted_files = []
+
+    if tenant_dir.exists():
+        for pdf_file in tenant_dir.rglob("*.pdf"):
+            deleted_files.append(pdf_file.name)
+            pdf_file.unlink()
+
+    try:
+        store.delete_documents(
+            tenant_id=tenant_id
+        )
+
+        return {
+            "status": "success",
+            "tenant_id": tenant_id,
+            "deleted_files": deleted_files,
+            "files_deleted": len(deleted_files),
+            "message": "Tenant documents and vectors cleared.",
+        }
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to clear documents: {exc}",
+        )
 
 @app.post("/upload")
 async def upload_files(
