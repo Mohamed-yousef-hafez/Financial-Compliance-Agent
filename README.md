@@ -2,9 +2,6 @@
 
 Production-style Agentic RAG project for financial document compliance analysis.
 
-## Scope
-
-The system analyzes financial contracts and internal policies. It retrieves relevant evidence, reranks results, applies tenant isolation and security checks, generates grounded compliance answers, and returns structured results with sources and a concise decision trace.
 
 ## Core capabilities
 
@@ -27,12 +24,6 @@ Evaluation utilities
 FastAPI API
 Automated tests
 Docker support
-
-## Architecture
-
-A request enters FastAPI and is passed to the compliance agent. The agent validates the request, checks for prompt injection, selects approved tools, retrieves tenant-scoped evidence, reranks the evidence, evaluates whether enough evidence exists, classifies the compliance risk, generates a grounded response, and returns structured output.
-
-The decision trace contains high-level execution events only. It is not hidden chain-of-thought.
 
 ## Requirements
 
