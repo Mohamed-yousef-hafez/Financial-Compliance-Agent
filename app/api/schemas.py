@@ -9,11 +9,11 @@ class ChatRequest(BaseModel):
     tenant_id: str = Field(min_length=1)
     question: str = Field(min_length=1)
 
-
 class Source(BaseModel):
     source: str
     page: int
     score: float
+    text: str
 
 
 class ChatResponse(BaseModel):
