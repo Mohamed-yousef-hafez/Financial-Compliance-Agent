@@ -15,6 +15,8 @@ htmlcov/
 !.env.example
 
 chroma_db/
+chromadb/
+data/chroma_db/
 
 *.log
 
@@ -27,10 +29,6 @@ Thumbs.db
 *.egg-info/
 dist/
 build/
+
 *.db
 *.sqlite
-# ChromaDB
-chroma_db/
-chromadb/
-data/chroma_db/
-data/chromadb/
