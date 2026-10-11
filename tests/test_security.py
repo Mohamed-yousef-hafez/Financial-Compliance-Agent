@@ -3,6 +3,7 @@ from app.core.security import (
     authorize,
     can_access_document,
     normalize_access_metadata,
+    normalize_list,
 )
 
 
@@ -66,3 +67,13 @@ def test_permission_denied():
         assert False, "Expected PermissionError"
     except PermissionError:
         pass
+
+
+def test_normalize_list_preserves_unicode_values_and_discards_unicode_whitespace_entries():
+    # Access-control lists are documented as comma-separated values; Unicode role
+    # names must not be lost when optional whitespace-only entries are discarded.
+    assert normalize_list(" analyst,\u00a0工程师\u2003,\u2009, manager ") == [
+        "analyst",
+        "工程师",
+        "manager",
+    ]
