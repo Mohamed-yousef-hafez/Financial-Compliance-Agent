@@ -1,3 +1,4 @@
+
 import os
 import requests
 import streamlit as st
@@ -86,7 +87,18 @@ if st.sidebar.button("Index Included Demo Documents"):
                 f"{API_URL}/ingest",
                 json={
                     "tenant_id": tenant_id,
-                    "access_scope": "tenant",
+                    "access_scope": access_scope,
+                    "allowed_roles": [
+                        role.strip()
+                        for role in allowed_roles.split(",")
+                        if role.strip()
+                    ],
+                    "allowed_users": [
+                        allowed_user.strip()
+                        for allowed_user in allowed_users.split(",")
+                        if allowed_user.strip()
+                    ],
+
                 },
                 headers={"X-Demo-User": user_id},
                 timeout=120,
