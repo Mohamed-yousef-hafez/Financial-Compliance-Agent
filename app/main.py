@@ -5,7 +5,7 @@ from fastapi import FastAPI, File, Header, HTTPException, UploadFile
 
 from app.agents.agent import ComplianceAgent
 from app.api.schemas import ChatRequest, ChatResponse, IngestRequest
-from app.core.config import DATA_DIR
+from app.core.config import DATA_DIR, REPO_DATA_DIR
 from app.core.security import (
     DEMO_USERS,
     UserContext,
@@ -15,7 +15,7 @@ from app.core.security import (
 )
 from app.ingestion.pipeline import build_documents
 from app.retrieval.retriever import Retriever
-from app.retrieval.store import ChromaStore
+from app.retrieval.store import SupabaseVectorStore
 
 
 app = FastAPI(
@@ -23,7 +23,7 @@ app = FastAPI(
     version="2.0.0",
 )
 
-store = ChromaStore()
+store = SupabaseVectorStore()
 retriever = Retriever(store)
 agent = ComplianceAgent(retriever)
 
@@ -255,18 +255,28 @@ def ingest(
     )
 
     try:
+        ingest_data_dir = DATA_DIR
+
+        if (
+            not (DATA_DIR / tenant_id).exists()
+            and (REPO_DATA_DIR / tenant_id).exists()
+        ):
+            ingest_data_dir = REPO_DATA_DIR
+
         documents = build_documents(
-            data_dir=DATA_DIR,
+            data_dir=ingest_data_dir,
             tenant_id=tenant_id,
             access_scope=policy["access_scope"],
             allowed_roles=policy["allowed_roles"],
             allowed_users=policy["allowed_users"],
         )
+
         if not documents:
             raise HTTPException(
                 status_code=400,
                 detail="No readable documents found for this tenant.",
             )
+        
 
         sources = sorted({item["metadata"]["source"] for item in documents})
         document_ids = sorted({item["metadata"]["document_id"] for item in documents})

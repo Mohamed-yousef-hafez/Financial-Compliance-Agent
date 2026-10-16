@@ -3,18 +3,16 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 BASE_DIR = Path(__file__).resolve().parents[2]
 load_dotenv(BASE_DIR / ".env")
 
-DATA_DIR = BASE_DIR / "data"
-CHROMA_DIR = BASE_DIR / "chroma_db"
+REPO_DATA_DIR = BASE_DIR / "data"
+if os.getenv("VERCEL"):
+    DATA_DIR = Path("/tmp/financial-compliance-data")
+else:
+    DATA_DIR = Path(os.getenv("DATA_DIR", str(REPO_DATA_DIR)))
 
-EMBEDDING_MODEL = os.getenv(
-    "EMBEDDING_MODEL",
-    "BAAI/bge-small-en-v1.5",
-)
-
+SUPABASE_DB_URL = os.getenv("SUPABASE_DB_URL", "").strip()
 TOP_K = int(os.getenv("TOP_K", "8"))
 RERANK_K = int(os.getenv("RERANK_K", "5"))
 MIN_EVIDENCE_SCORE = float(os.getenv("MIN_EVIDENCE_SCORE", "0.18"))

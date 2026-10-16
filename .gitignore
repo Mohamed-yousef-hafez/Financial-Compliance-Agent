@@ -32,3 +32,5 @@ build/
 
 *.db
 *.sqlite
+sql/
+supabase_schema.sql/
