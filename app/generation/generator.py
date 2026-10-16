@@ -77,11 +77,18 @@ Provide a concise answer and mention the relevant source.
             except Exception as exc:
                 error_text = str(exc)
 
+                print(
+                    f"Gemini error on attempt "
+                    f"{attempt + 1}/{max_attempts}: "
+                    f"{error_text}"
+                )
+
                 is_unavailable = (
                     "503" in error_text
                     or "UNAVAILABLE" in error_text
                     or "high demand" in error_text.lower()
                 )
+                
 
                 if not is_unavailable:
                     raise

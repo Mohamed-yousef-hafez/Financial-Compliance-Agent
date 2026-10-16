@@ -10,9 +10,17 @@ st.set_page_config(
     layout="wide",
 )
 
+try:
+    default_api_url = st.secrets["API_URL"]
+except Exception:
+    default_api_url = os.getenv(
+        "API_URL",
+        "http://127.0.0.1:8000",
+    )
+
 API_URL = st.sidebar.text_input(
     "API URL",
-    os.getenv("API_URL", "http://127.0.0.1:8000"),
+    default_api_url,
 ).rstrip("/")
 
 USER_OPTIONS = {
