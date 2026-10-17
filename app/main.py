@@ -16,11 +16,19 @@ from app.core.security import (
 from app.ingestion.pipeline import build_documents
 from app.retrieval.retriever import Retriever
 from app.retrieval.store import SupabaseVectorStore
-
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="Financial Compliance Agent",
     version="2.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # يسمح لتطبيق Streamlit بالاتصال بالـ API بدون مشاكل
+    allow_credentials=True,
+    allow_methods=["*"],  # يسمح بجميع العمليات مثل GET, POST, DELETE
+    allow_headers=["*"],  # يسمح بجميع الـ Headers بما فيها x-demo-user المخصص لديك
 )
 
 store = SupabaseVectorStore()
