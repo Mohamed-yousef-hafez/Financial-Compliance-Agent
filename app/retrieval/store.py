@@ -157,7 +157,7 @@ class SupabaseVectorStore:
                 )
             )
         with self._connect() as conn:
-            conn.executemany(sql, rows)
+            conn.cursor().executemany(sql, rows)
         return len(rows)
 
     def replace_documents(self, documents, tenant_id, document_ids=None, sources=None):
