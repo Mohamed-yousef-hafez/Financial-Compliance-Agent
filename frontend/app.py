@@ -38,8 +38,54 @@ selected_user_label = st.sidebar.selectbox(
 )
 user_id = USER_OPTIONS[selected_user_label]
 
+DEMO_USERS_FALLBACK = {
+    "admin_demo": {
+        "tenant_id": "tenant_demo",
+        "roles": ["admin"],
+        "permissions": [
+            "documents:read",
+            "documents:write",
+            "compliance:analyze",
+            "audit:read",
+            "users:manage",
+        ],
+    },
+    "analyst_demo": {
+        "tenant_id": "tenant_demo",
+        "roles": ["analyst"],
+        "permissions": ["documents:read", "compliance:analyze"],
+    },
+    "manager_demo": {
+        "tenant_id": "tenant_demo",
+        "roles": ["manager"],
+        "permissions": [
+            "documents:read",
+            "documents:write",
+            "compliance:analyze",
+            "audit:read",
+        ],
+    },
+    "auditor_demo": {
+        "tenant_id": "tenant_demo",
+        "roles": ["auditor"],
+        "permissions": [
+            "documents:read",
+            "compliance:analyze",
+            "audit:read",
+        ],
+    },
+    "company_b_analyst": {
+        "tenant_id": "tenant_b",
+        "roles": ["analyst"],
+        "permissions": ["documents:read", "compliance:analyze"],
+    },
+}
+
 try:
-    users_response = requests.get(f"{API_URL}/demo-users", timeout=10)
+    users_response = requests.get(
+        f"{API_URL}/demo-users",
+        timeout=10,
+    )
     if users_response.ok:
         users = {
             item["user_id"]: item
@@ -51,6 +97,10 @@ except requests.RequestException:
     users = {}
 
 current_user = users.get(user_id, {})
+
+if not current_user.get("permissions"):
+    current_user = DEMO_USERS_FALLBACK.get(user_id, current_user)
+
 tenant_id = current_user.get("tenant_id", "tenant_demo")
 roles = current_user.get("roles", [])
 permissions = current_user.get("permissions", [])
