@@ -77,23 +77,6 @@ def require_tenant(tenant_id: str) -> str:
     return tenant_id.strip()
 
 
-def authenticate_demo_user(user_id: str) -> UserContext:
-    if not user_id or not user_id.strip():
-        raise PermissionError("Authentication required")
-
-    user = DEMO_USERS.get(user_id.strip())
-    if user is None:
-        raise PermissionError("Unknown user identity")
-
-    return user
-
-
-def authorize(user: UserContext, permission: str) -> None:
-    if permission not in user.permissions:
-        raise PermissionError(
-            f"User is not authorized for '{permission}'"
-        )
-
 
 def normalize_list(values: list[str] | tuple[str, ...] | str | None) -> list[str]:
     if not values:
