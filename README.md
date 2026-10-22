@@ -18,7 +18,11 @@ Secure multi-tenant RAG system for financial compliance analysis.
 - Server-side authorization for upload, ingest, clear, and chat.
 - Security tests for tenant, role, user, and permission boundaries.
 - Prompt-injection check remains before retrieval.
+## Demo Video
 
+Watch the Financial Compliance Agent interface demo:
+
+[▶ Watch the Demo Video](https://github.com/user-attachments/assets/293082fa-6459-439f-8603-c0b5bf0538a0)
 ## Important security note
 
 The included identity mechanism is a **local demo authentication layer**, not production authentication. Users are selected from a server-side demo registry and passed through the `X-Demo-User` header. For production, replace this with a verified JWT/OAuth2/SSO identity provider and a real user/role directory.
