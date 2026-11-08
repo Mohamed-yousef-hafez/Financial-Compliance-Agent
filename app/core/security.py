@@ -29,6 +29,7 @@ DEMO_USERS = {
         permissions=(
             "documents:read",
             "documents:write",
+            "documents:delete",
             "compliance:analyze",
             "audit:read",
             "users:manage",

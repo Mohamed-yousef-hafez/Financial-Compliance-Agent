@@ -1,36 +1,37 @@
-.venv/
-venv/
-env/
-
+# Python
 __pycache__/
 *.py[cod]
+*.egg-info/
 
-.pytest_cache/
-.coverage
-htmlcov/
+# Virtual environments
+.venv/
+venv/
 
-.env
-.env.*
-
-!.env.example
-
-chroma_db/
-
-data/chroma_db/
-
-*.log
-
+# IDE and OS
 .vscode/
 .idea/
-
 .DS_Store
 Thumbs.db
 
-*.egg-info/
+# Logs and build
+*.log
 dist/
 build/
 
+# Databases and local data
 *.db
 *.sqlite
-sql/
-supabase_schema.sql/
+data/
+chroma_db/
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Markdown files
+*.md
+!README.md
+.pytest_cache/
+*.backup
+security_backup_*/

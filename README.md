@@ -176,7 +176,7 @@ The same authorization rules apply.
 
 `DELETE /documents/{tenant_id}`
 
-The authenticated user must belong to that tenant and have `documents:write`.
+The authenticated user must belong to that tenant and have `documents:delete`. Re-indexing an existing file uses a separate transaction-scoped replacement path and still requires `documents:write`.
 
 ## Run tests
 
@@ -198,3 +198,16 @@ The security-focused test suite covers:
 ## Deployment
 
 The project can still be deployed as separate FastAPI and Streamlit services. Configure the same environment variables in the deployment platform and replace the local demo authentication layer with the company's real identity provider before production use.
+
+
+## Optional Supabase Auth (JWT)
+
+The local/demo mode remains the default for development. To test real sign-in, first follow:
+
+- `docs/AUTHENTICATION_SETUP_AR.md`
+- `docs/DATA_SECURITY_REVIEW_AR.md`
+- `SECURITY_HARDENING_STEPS_AR.md`
+
+Set `AUTH_MODE=supabase_jwt` in both Backend and Streamlit only after the Supabase schema, RLS policies, Auth users, and `compliance_user_access` rows have been configured and tested. Set `APP_ENV=production` on the deployed Backend; production mode refuses to start with demo authentication.
+
+**Do not use the current local-PDF/SnapDeploy/Streamlit Community Cloud deployment for confidential company files.** The original PDFs still live on the Backend container filesystem, and this patch does not add private persistent object storage or a production data-retention/deletion workflow. Use synthetic or redacted PDFs until storage, hosting, provider terms, backups, and deletion requirements have been approved by the company.
